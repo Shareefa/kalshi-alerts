@@ -4,11 +4,15 @@ import os
 import time
 from dotenv import load_dotenv
 import shlex
-from kalshi.client import KalshiHTTPClient, KalshiWebSocketClient
 import logging
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 
-from kalshi.types import GetMarketsParams, GetTradesParams, Market, MarketStatus, Trade
+from kalshi.client import KalshiHTTPClient, KalshiWebSocketClient
+from kalshi.notification import TwilioClient
+from kalshi.types import GetMarketsParams, GetTradesParams, Market, MarketStatus, Trade, GetEventsParams
 from kalshi.utils import analyze_json_type
+from dataclasses import asdict
 
 _logger = logging.getLogger(__name__)
 
@@ -57,18 +61,33 @@ def read_trades():
                 yield json.loads(line)
 
 def main():
-    # load_dotenv() 
-    # logging.basicConfig(level=logging.INFO)
-    # client = KalshiHTTPClient()
-    # with open('./kalshi/data/markets.jsonl', 'r', encoding='utf-8') as f:
-    #     markets = [json.loads(line) for line in f]
-    # get_trades(client, markets)
-    for trade in read_trades():
-        try:
-            Trade(**trade)
-        except Exception as e:
-            print(json.dumps(trade, indent=2))
-            raise e
+    load_dotenv() 
+    logging.basicConfig(level=logging.INFO)
+    client = KalshiHTTPClient()
+
+    with open('./data/kalshi_links.txt', 'r') as f:
+        links = f.readlines()
+    
+    for link in links:
+        link = link.strip()
+        # Extract series ID from link format: https://kalshi.com/markets/{series_id}/...
+        series_id = link.split('/markets/')[1].split('/')[0].upper()
+        
+        _logger.info(f'Getting series data for {series_id}')
+        series_data = client.get_series(series_id)
+        
+        with open('./data/events.json', 'a', encoding='utf-8') as f:
+            json.dump(series_data, f, indent=2, ensure_ascii=False)
+
+    # get all markets for a series
+    _logger.info('Getting all markets for a series')
+    series_id = 'KXBTCD'
+    params = GetMarketsParams(status=MarketStatus.OPEN, series_ticker=series_id)
+    markets = client.get_markets(params=params, limit=10)
+    for market in markets:
+        with open('./data/markets_2.jsonl', 'a', encoding='utf-8') as f:
+            f.write(json.dumps(asdict(market), ensure_ascii=False, indent=2) + '\n')
+    
 
 if __name__ == '__main__':
     main()

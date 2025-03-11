@@ -10,6 +10,7 @@ class _MarketEndpoints(NamedTuple):
     EVENTS = '/events'
     MARKETS = '/markets'
     TRADES = '/markets/trades'
+    SERIES = '/series'
 
 class Endpoints(NamedTuple):
     PORTFOLIO = _PortfolioEndpoints

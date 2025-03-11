@@ -92,11 +92,15 @@ class StrikeType(str, Enum):
     FUNCTIONAL = "functional"
     CUSTOM = "custom"
 
-@pydantic.dataclasses.dataclass
+# @pydantic.dataclasses.dataclass
+@dataclass
 class Market(Response):
+    # Required fields
     can_close_early: bool
-    category: str
+    category: str 
     close_time: datetime.datetime
+    event_ticker: str
+    expiration_time: datetime.datetime
     last_price: int
     latest_expiration_time: datetime.datetime
     liquidity: int
@@ -128,8 +132,11 @@ class Market(Response):
     # Optional fields
     cap_strike: Optional[float] = None
     custom_strike: Optional[Dict] = None
+    expected_expiration_time: Optional[datetime.datetime] = None
+    expiration_value: Optional[str] = None
+    fee_waiver_expiration_time: Optional[datetime.datetime] = None
     floor_strike: Optional[float] = None
-    functional_strike: Optional[Dict] = None
+    functional_strike: Optional[str] = None
     result: Optional[MarketResult] = None
     settlement_value: Optional[int] = None
     subtitle: Optional[str] = None

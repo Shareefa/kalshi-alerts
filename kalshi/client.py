@@ -90,6 +90,12 @@ class KalshiHTTPClient(KalshiBaseClient):
             api_limit=api_limit,
             **kwargs,
         )
+    
+    def get_event(self, event_id):
+        return self._get(f'{Endpoints.MARKET.EVENTS}/{event_id}')
+    
+    def get_series(self, series_id):
+        return self._get(f'{Endpoints.MARKET.SERIES}/{series_id}')
 
     def get_markets(
         self,

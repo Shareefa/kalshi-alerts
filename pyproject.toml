@@ -1,9 +1,11 @@
 [tool.poetry]
-name = "trading"
+name = "trading-main"
 version = "0.1.0"
 description = ""
-authors = ["Danish Mohammed"]
+authors = ["Abdullah Shareef"]
 readme = "README.md"
+package-mode = true
+packages = [{include = "kalshi"}]
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -12,6 +14,7 @@ requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 websocket-client = "^1.8.0"
 pydantic = "^2.10.5"
+twilio = "^9.4.6"
 
 
 [build-system]
